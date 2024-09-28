@@ -1,0 +1,274 @@
+    <!-- Start header -->
+    <header class="header">
+        <nav>
+            <div class="container">
+                <div class="logo">
+                    <a href="{% url 'home' %}">TechHaven</a>
+                </div>
+    
+                <ul class="nav-links">
+                    <li class="link">
+                        <a href="">
+                            <i class="fa-solid fa-cart-shopping">
+                                <span>
+                                    {% if items_count %}
+                                        {{items_count}}
+                                    {% else %}
+                                        0
+                                    {% endif %}
+                                </span>
+                            </i>
+                            <p>Cart</p>
+                        </a>
+                    </li>
+                    <li class="link">
+                        <a href="">
+                            <i class="fa-solid fa-heart">
+                                <span>
+                                    {% if wishlist_count %}
+                                        {{wishlist_count}}
+                                    {% else %}
+                                        0
+                                    {% endif %}
+                                </span>
+                            </i>
+                            <p>Wishlist</p>
+                        </a>
+                    </li>
+                    {% if request.user.is_authenticated %}
+                        <li class="link">
+                            <a href="">
+                                <i class="fa-solid fa-user"></i>
+                                <p>My Account</p>
+                            </a>
+                        </li>
+                        <li class="link">
+                            <form id="logout-form" action="" method="post">
+                                {% csrf_token %}
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                <input type="submit" value="Logout">
+                            </form>
+                        </li>                  
+                    {% else %}
+                        <li class="link">
+                            <a href="">
+                                <i class="fa-solid fa-user"></i>
+                                <p>Login</p>
+                            </a>
+                        </li>
+                        <li class="link">
+                            <a href="">
+                                <i class="fa-solid fa-user"></i>
+                                <p>Register</p>
+                            </a>
+                        </li>
+                    {% endif %}
+                    <div class="remove-menu">
+                        <i class="fa-solid fa-xmark"></i>
+                    </div>
+                </ul>
+                <div class="mobile-icons">
+                    <div class="cart-out">
+                        <a href="">
+                            <i class="fa-solid fa-cart-shopping">
+                                <span>0</span>
+                            </i>
+                        </a>
+                    </div>
+                    <div class="nav-icon"><i class="fa-solid fa-bars"></i></div>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="container">
+            <div class="category">
+                <div class="select-category-button">
+                    <p>Select category</p>
+                    <i class="fa-solid fa-check-double"></i>
+                </div>
+                <div class="parent-categories">
+                    {% if mobile_phones %}
+                        <div data-name="mobile-phones" class="parent-category">{{mobile_phones.name}}</div>
+                    {% endif %}
+
+                    {% if computers %}
+                        <div data-name="computers" class="parent-category">{{computers.name}}</div>
+                    {% endif %}
+
+                    {% if accessories %}
+                        <div data-name="accessories" class="parent-category">{{accessories.name}}</div>
+                    {% endif %}
+
+                    {% if brands %}
+                        <div data-name="brands" class="parent-category">{{brands.name}}</div>
+                    {% endif %}
+
+                    {% if electronics %}
+                        <div data-name="electronics" class="parent-category">{{electronics.name}}</div>
+                    {% endif %}
+                </div>
+
+                <div id="brands">
+                    <div class="container">
+                        <div class="title">
+                            {% if brands %}
+                                <p>{{brands.name}}</p>
+                                <i class="fa-solid fa-xmark"></i>
+                            {% endif %}
+                        </div>
+                        <ul class="brands-links">
+                            {% if brands_categories %}                            
+                                {% for brand_category in brands_categories %}                            
+                                    <li class="link">
+                                        <a href="" class="brand">{{brand_category.name}}</a>
+                                        {% comment %} <a href="{% url 'product_category' brands.category_slug brand_category.category_slug %}" class="brand">{{brand_category.name}}</a> {% endcomment %}
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="mobile-phones">
+                    <div class="container">
+                        <div class="title">
+                            {% if mobile_phones %}
+                                <p>{{mobile_phones.name}}</p>
+                                <i class="fa-solid fa-xmark"></i>
+                            {% endif %}
+                        </div>
+                        <div class="mobile-phones-links">
+                            <div class="box">
+                                <div class="sub-title">Operating System</div>
+                                <ul>
+                                    {% if mobile_phones_os %}                                    
+                                        {% for mobile_phone_os in mobile_phones_os %}                                    
+                                            <li class="link">
+                                                <a href="" class="phone">
+                                                {% comment %} <a href="{% url 'product_category' mobile_phones.category_slug mobile_phone_os.category_slug %}" class="phone"> {% endcomment %}
+                                                    <i class="{{mobile_phone_os.category_icon}}"></i>
+                                                    <p>{{mobile_phone_os.name}}</p>
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            <div class="box">
+                                <div class="sub-title">Hot Brands</div>
+                                <ul>
+                                    {% if mobile_phones_hot_brand %}
+                                        {% for mobile_phone_hot_brand in mobile_phones_hot_brand %}                                    
+                                        <li class="link">
+                                            <a href="" class="phone">{{mobile_phone_hot_brand.name}}</a>
+                                            {% comment %} <a href="{% url 'product_category' mobile_phones.category_slug mobile_phone_hot_brand.category_slug %}" class="phone">{{mobile_phone_hot_brand.name}}</a> {% endcomment %}
+                                        </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="computers">
+                    <div class="container">
+                        <div class="title">
+                            {% if computer %}
+                                <p>{{computers.name}}</p>
+                                <i class="fa-solid fa-xmark"></i>
+                            {% endif %}
+                        </div>
+                        <div class="computers-links">
+                            <div class="box">
+                                <div class="sub-title">Computer Appearance</div>
+                                <ul>
+                                    {% if computers_appearance %}                                    
+                                        {% for computer_appearance in computers_appearance %}                                    
+                                            <li class="link">
+                                                {% comment %} <a href="{% url 'product_category' computers.category_slug computer_appearance.category_slug %}" class="phone"> {% endcomment %}
+                                                <a href="" class="phone">
+                                                    <i class="{{computer_appearance.category_icon}}"></i>
+                                                    <p>{{computer_appearance.name}}</p>
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            <div class="box">
+                                <div class="sub-title">Hot Brands</div>
+                                <ul>
+                                    {% if computers_hot_brand %}
+                                        {% for computer_hot_brand in computers_hot_brand %}                                    
+                                            <li class="link">
+                                                <a href="" class="phone">{{computer_hot_brand.name}}</a>
+                                                {% comment %} <a href="{% url 'product_category' computers.category_slug computer_hot_brand.category_slug %}" class="phone">{{computer_hot_brand.name}}</a> {% endcomment %}
+                                            </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="accessories">
+                    <div class="container">
+                        <div class="title">
+                            {% if accessories %}
+                                <p>{{accessories.name}}</p>
+                                <i class="fa-solid fa-xmark"></i>
+                            {% endif %}
+                        </div>
+                        <ul class="accessories-links">
+                            {% if vaccessories_categories %}
+                                {% for accessorie_category in accessories_categories %}                            
+                                    <li class="link">
+                                        <a href="">
+                                        {% comment %} <a href="{% url 'product_category' accessories.category_slug accessorie_category.category_slug %}"> {% endcomment %}
+                                            <i class="{{accessorie_category.category_icon}}"></i>
+                                            <p>{{accessorie_category.name}}</p>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="electronics">
+                    <div class="container">
+                        <div class="title">
+                            {% if electronics %}
+                                <i class="fa-solid fa-xmark"></i>
+                                <p>{{electronics.name}}</p>
+                            {% endif %}
+                        </div>
+                        <ul class="electronics-links">
+                            {% if electronics_categories %}
+                                {% for electronic_category in electronics_categories %}                            
+                                    <li class="link">
+                                        <a href="{% url 'product_category' electronics.category_slug electronic_category.category_slug %}">
+                                            <i class="{{electronic_category.category_icon}}"></i>
+                                            <p>{{electronic_category.name}}</p>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
+                        </ul>
+                    </div> 
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="search-bar">
+                <form action="" method="get">
+                    <input type="search" name="q" placeholder="Search">
+                </form>
+                <a href="" class="custom-search">Custom Search</a>
+            </div>
+        </div>
+    </header>
+    <!-- End header -->

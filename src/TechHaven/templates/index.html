@@ -1,0 +1,151 @@
+{% extends "base/layout.html" %}
+
+{% block title %}Tech Haven - Home{% endblock title %}
+{% block content %}
+{% load static %}
+
+    {% include "components/header.html" %}
+
+    <!-- Start landing page -->
+    <div class="landing">
+        <div class="slide">
+            <div class="item" style="background-image: url({% static 'images/landing-images/disktop.jpg' %});">
+                <div class="content">
+                    <div class="name">HQ Desktop</div>
+                    <div class="des">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ab, eum!</div>
+                    <button>See More</button>
+                </div>
+            </div>
+            <div class="item" style="background-image: url({% static 'images/iphone.webp' %});">
+                <div class="content">
+                    <div class="name">New Phones</div>
+                    <div class="des">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ab, eum!</div>
+                    <button>See More</button>
+                </div>
+            </div>
+            <div class="item" style="background-image: url({% static 'images/laptop.webp' %});">
+                <div class="content">
+                    <div class="name">Amazing Laptop</div>
+                    <div class="des">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ab, eum!</div>
+                    <button>See More</button>
+                </div>
+            </div>
+            <div class="item" style="background-image: url({% static 'images/phone.png' %});">
+                <div class="content">
+                    <div class="name">Wonderful Phone</div>
+                    <div class="des">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ab, eum!</div>
+                    <button>See More</button>
+                </div>
+            </div>
+            <div class="item" style="background-image: url({% static 'images/watch.jpg' %});">
+                <div class="content">
+                    <div class="name">Smart Watch</div>
+                    <div class="des">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ab, eum!</div>
+                    <button>See More</button>
+                </div>
+            </div>
+    
+        </div>
+    
+        <div class="button">
+            <button class="prev"><i class="fa-solid fa-arrow-left"></i></button>
+            <button class="next"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>    
+    </div>
+    <!-- End landing page -->
+
+    <!-- Start Features -->
+    <div class="features">
+        <div class="container">
+            <div class="feature">
+                <i class="fa-solid fa-truck-fast"></i>
+                <p>Fast Shipping</p>
+            </div>
+            <div class="feature">
+                <i class="fa-solid fa-truck-ramp-box"></i>
+                <p>Delivery to worldWide</p>
+            </div>
+            <div class="feature">
+                <i class="fa-solid fa-truck"></i>
+                <p>Free shipping</p>
+            </div>
+            <div class="feature">
+                <i class="fa-solid fa-award"></i>
+                <p>12 months warranty</p>
+            </div>
+        </div>
+    </div>
+    <!-- End Features -->
+
+    <!-- Start Best offer  -->
+    <div class="best-offer">
+        <div class="container">
+            <div class="title">
+                <i class="fa-solid fa-bullseye"></i>
+                <p>
+                    Best Offer
+                </p>
+            </div>
+            <i id="arrow" data-arrow_name="left" class="fa-solid fa-arrow-left"></i>
+            <div class="products-list">
+                {% if products %}
+                    {% for product in products reversed %}
+                        <div class="card">
+                            <div class="image">
+                                {% if product.product_main_image %}
+                                    <img src="{{product.product_main_image.url}}" alt="{{product.product_name}}">
+                                {% endif %}
+                            </div>
+                            <div class="product-name"><a href="{% url 'single_product' product.product_slug %}">{{product.product_name}}</a></div>
+                            <div class="product-price">${{product.product_price}}</div>
+                            <div class="product-action">
+                                <button data-product='{{product.id}}' data-action="add" class="add-to-cart">Add To Cart</button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                <div class="card">
+                    <p>No products to show</p>
+                </div>
+                {% endif %}
+
+            </div>
+            <i id="arrow" data-arrow_name="right" class="fa-solid fa-arrow-right"></i>
+        </div>
+    </div>
+    <!-- End Best offer  -->
+
+    <!-- Start Reviews -->
+    {% include "components/our-client.html" %}
+    <!-- End Reviews -->
+
+    {% include "components/footer.html" %}
+
+    <script>
+        const addItemToCookie = (productId, action) => {
+            if (action === "add") {
+                if (cart[productId] === undefined) {
+                    cart[productId] = {"quantity": 1}
+                } else {
+                    cart[productId] = {"quantity": cart[productId]['quantity'] += 1}
+                }
+                document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+            }
+            location.reload();
+        };
+
+        const addToCartButtons = Array.from(document.querySelectorAll(".add-to-cart"));
+        const addToCartHandler = (btns) => {
+            btns.forEach((btn) => {
+                btn.addEventListener("click", e => {
+                    let productId = e.target.dataset.product;
+                    let action = e.target.dataset.action;
+                    addItemToCookie(productId, action);
+                });
+            });
+        };
+        addToCartHandler(addToCartButtons);
+
+
+    </script>
+{% endblock content %}

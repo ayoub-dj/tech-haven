@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}Tech Haven{% endblock title %}
+    </title>
+
+    <!-- Main css -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" >
+    {% comment %} Tech Haven {% endcomment %}
+
+    <!-- Web Fonts -->
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+
+    <link rel="icon" href="{% static 'images/icons/icon.png' %}">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
+</head>
+<style>
+    .messages {
+        width: 90%;
+        text-align: center;
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: var(--main-border-radius);
+        z-index: 10000000;
+    }
+    .messages li {
+        padding: 15px 10px;
+        margin-bottom: 10px;
+        border-radius: var(--main-border-radius);
+        color: #fff;
+        opacity: 0;
+        animation: fadeIn 1s forwards;
+    }
+    .messages .success {
+        background-color: #4CAF50; /* Green */
+    }
+    .messages .error {
+        background-color: #f44336; /* Red */
+    }
+    .messages .info {
+        background-color: #2196F3; /* Blue */
+    }
+    .messages .warning {
+        background-color: #ff9800; /* Orange */
+    }
+    .messages .fade-out {
+        animation: fadeOut 1s forwards;
+    }
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+    }
+</style>
+<body>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    
+    {% block content %}
+    
+    {% endblock content %}
+    
+    <!-- Main Javascript -->
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        let user = "{{request.user}}"
+
+        function loadMessages() {
+            document.addEventListener('DOMContentLoaded', function() {
+                const messages = document.querySelectorAll('.messages li');
+                
+                messages.forEach(function(message) {
+                    setTimeout(function() {
+                        message.classList.add('fade-out');
+                        message.parentElement.remove();
+                    }, 4000);
+                });
+            });
+        };
+        
+        loadMessages();
+
+        const getCookie = (name) => {
+            if (document.cookie && document.cookie !== '') {
+                let cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) if (name === cookies[i].split('=')[0].trim()) return decodeURIComponent(cookies[i].split('=')[1]);
+                return null;
+            }
+        };
+
+        let cart;
+        try {
+            cart = JSON.parse(getCookie('cart'));
+        }
+        catch (error) {
+            cart = null;
+        }
+
+        if (cart === null) {
+            cart = {}
+            document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+        };
+
+        const searchBar = document.querySelector('.search-bar form input');
+
+        searchBar.addEventListener("keypress", (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                let bodyChildren = Array.from(document.body.children);
+                bodyChildren.forEach((ele) => {
+                    if (ele.tagName !== 'SCRIPT') {
+                        if (ele.className !== 'header' && ele.className !== 'footer') {
+                            ele.style.display = 'None';
+                        };
+                        
+                    };
+
+                });
+
+                try {
+                    const header = document.querySelector('.header');
+                    const searchPosts = document.createElement('div'),
+                            container = document.createElement('div');
+        
+                    searchPosts.className = 'search-posts';
+                    container.className = 'container';
+        
+                    
+                    let bodyChildren = Array.from(document.body.children);
+                    
+                    let trueContainer = []
+        
+                    const bodyChildrenChicker = (elements) => {
+                        for (let index = 0; index < elements.length; index++) {
+                            const elem = elements[index]
+                            if (elem.tagName === 'DIV') {
+                                trueContainer.push(true)
+                            }
+                        };
+                    };
+                    
+                    
+                    bodyChildrenChicker(bodyChildren);
+                    
+                    searchPosts.append('container');
+                    if (trueContainer.length < 2) {
+                        header.append(searchPosts)
+                    };
+        
+        
+                
+        
+                    const styles = {
+                        '': '',
+                    }
+        
+                } catch (error) {
+                }
+            }
+        });
+        
+
+    </script>
+</body>
+</html>
