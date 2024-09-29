@@ -8,7 +8,7 @@
     
                 <ul class="nav-links">
                     <li class="link">
-                        <a href="">
+                        <a href="{% url 'cart' %}">
                             <i class="fa-solid fa-cart-shopping">
                                 <span>
                                     {% if items_count %}
@@ -43,7 +43,7 @@
                             </a>
                         </li>
                         <li class="link">
-                            <form id="logout-form" action="" method="post">
+                            <form id="logout-form" action="{% url 'logout' %}" method="post">
                                 {% csrf_token %}
                                 <i class="fa-solid fa-right-from-bracket"></i>
                                 <input type="submit" value="Logout">
@@ -51,13 +51,13 @@
                         </li>                  
                     {% else %}
                         <li class="link">
-                            <a href="">
+                            <a href="{% url 'login' %}">
                                 <i class="fa-solid fa-user"></i>
                                 <p>Login</p>
                             </a>
                         </li>
                         <li class="link">
-                            <a href="">
+                            <a href="{% url 'register' %}">
                                 <i class="fa-solid fa-user"></i>
                                 <p>Register</p>
                             </a>

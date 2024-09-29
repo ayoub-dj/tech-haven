@@ -1,0 +1,48 @@
+{% extends "base/layout.html" %}
+
+{% block title %}Tech Haven - Register{% endblock title %}
+
+{% block content %}
+
+    {% include "components/header.html" %}
+
+    <!-- Start Register -->
+    <div class="register">
+        <div class="container">
+            <div class="title">
+                <div>Register</div>
+                <div>
+                    <p>Thank you for choosing us.</p>
+                    <p>Fields marked with <span>*</span> are required</p>
+                </div>
+            </div>
+
+            <div id="register-form">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {{form}}
+                    <div>
+                        <label>Register * :</label>
+                        <input type="submit" value="register">
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- End Register -->
+
+    {% include "components/footer.html" %}
+
+    <script>
+        const requiredFieldsLabels = Array.from(document.querySelectorAll('.register #register-form form div label'));
+        const requiredFieldsLabelHandler = (labels) => {
+            labels.forEach((elem) => {
+                elem.innerHTML = elem.innerText.replace('*', '<span style="color: red;">*</span>')
+            })
+        };
+        
+        requiredFieldsLabelHandler(requiredFieldsLabels);
+    </script>
+
+{% endblock content %}

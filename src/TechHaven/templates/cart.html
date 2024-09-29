@@ -1,0 +1,202 @@
+{% extends "base/layout.html" %}
+
+{% block title %}TechHaven Cart{% endblock title %}
+{% block content %}
+{% load static %}
+
+    {% include "components/header.html" %}
+
+    <!-- Start Cart -->
+    <div id="cart">
+        <div class="container">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="product-image">Product</th>
+                        <th class="product-name">Name</th>
+                        <th class="product-price">Price</th>
+                        <th class="product-quantity">Quantity</th>
+                        <th class="handle">Handle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if cart_items %}                    
+                        {% for cart_item in cart_items %}                    
+                            <tr>
+                                <td><img src="{{cart_item.product_image}}" alt=""></td>
+                                <td>{{cart_item.product_name}}</td>
+                                <td>{{cart_item.product_price}} $</td>
+                                <td >
+                                    <button id='minus' data-name="minus" data-product="{{cart_item.product_id}}">
+                                        <i class="fa-solid fa-minus"></i>
+                                    </button>
+                                    <span>{{cart_item.product_quantity}}</span>
+                                    <button id="plus" data-name="plus" data-product="{{cart_item.product_id}}">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+                                </td>
+                                <td class="handle"><button id="xmark" data-name="remove" data-product="{{cart_item.product_id}}"><i class="fa-solid fa-xmark"></i></button></td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td><img src="{% static 'images/products/product-1.jpg' %}" alt=""></td>
+                            <td>Product Name</td>
+                            <td>10000 $</td>
+                            <td >
+                                <button id='minus' data-name="minus" data-product="">
+                                    <i class="fa-solid fa-minus"></i>
+                                </button>
+                                <span>{{cart_item.product_quantity}}</span>
+                                <button id="plus" data-name="plus" data-product="">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </td>
+                            <td class="handle"><button id="xmark" data-name="remove" data-product=""><i class="fa-solid fa-xmark"></i></button></td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- End Cart -->
+
+    <!-- Start Cart Total & Coupon -->
+    <div class="coupon">
+        <div class="container">
+            <div class="col">
+                <h3>Cart Total</h3>
+                <div class="subtotal">
+                    <span>Items: </span>
+                    <span class="subtotal-price">
+                        {% if items_count %}
+                            {{items_count}}
+                        {% else %}
+                        0
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="total">
+                    <span>Total: </span>
+                    <span class="total-price">$
+                        {% if total_price %}
+                            {{total_price}}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="col">
+                {% if code %}
+                    <div class='coupon_code'>
+                        <h2>The Current Applied Coupon: <span style="">{{code}}</span></h2>
+                        <form id="coupon_code_form" action="{% url 'remove_coupon_code' %}" method="post">
+                            {% csrf_token %}
+                            <input type="submit" value="remove it">
+                        </form>
+                    </div>
+                {% else %}
+                    <form method='post' id="coupon-form">
+                        {% csrf_token %}
+                        {{form}}
+                        <div>
+                            <input type="submit" value="Apply Coupon">
+                        </div>
+                    </form>
+                {% endif %}
+
+            </div>
+            <div class="col">
+                <a class="checkout" href="">Proceed to checkout</a>
+            </div>
+
+
+        </div>
+    </div>
+    <!-- End Cart Total & Coupon -->
+
+    {% include "components/footer.html" %}
+
+    <script>
+        
+        const minusBtnsHandler = () => {
+            const minusBtns = Array.from(document.querySelectorAll("#minus"));
+
+            minusBtns.forEach((elem) => {
+                elem.addEventListener("click", e => {
+                    let target;
+                    if (e.target.tagName === 'I') {
+                        target = e.target.parentElement;
+                    } else {
+                        target = e.target;
+                    }
+    
+                    const cart = JSON.parse(getCookie('cart'));
+                    const productId = target.getAttribute("data-product");
+    
+                    if (cart[productId]['quantity'] <= 1) {
+                        delete cart[productId];
+                    } else {
+                        cart[productId]['quantity'] -= 1;
+                    }
+    
+                    document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+                    location.reload();
+                });
+            });
+        };
+        minusBtnsHandler();
+
+        const plusBtnsHandler = () => {
+            const plusBtns = Array.from(document.querySelectorAll("#plus"));
+
+            plusBtns.forEach((elem) => {
+                elem.addEventListener("click", e => {
+                    let target;
+                    if (e.target.tagName === 'I') {
+                        target = e.target.parentElement;
+                    } else {
+                        target = e.target;
+                    }
+    
+                    const cart = JSON.parse(getCookie('cart'));
+                    const productId = target.getAttribute("data-product");
+    
+                    cart[productId]['quantity'] += 1
+    
+                    document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+                    location.reload();
+                });
+            });
+        };
+        plusBtnsHandler()
+
+        const xmarkBtnsHandler = () => {
+            const xmarkBtns = Array.from(document.querySelectorAll("#xmark"));
+
+            xmarkBtns.forEach((elem) => {
+                elem.addEventListener("click", e => {
+                    let target;
+                    if (e.target.tagName === 'I') {
+                        target = e.target.parentElement;
+                    } else {
+                        target = e.target;
+                    }
+    
+                    const cart = JSON.parse(getCookie('cart'));
+                    const productId = target.getAttribute("data-product");
+    
+                    delete cart[productId];
+    
+                    document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+                    location.reload();
+                });
+            });
+        };
+        xmarkBtnsHandler()
+
+    </script>
+    
+{% endblock content %}

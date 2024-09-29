@@ -1,0 +1,41 @@
+{% extends "base/layout.html" %}
+
+{% block title %}Tech Haven - Login{% endblock title %}
+
+{% block content %}
+{% load static %}
+
+
+    {% include "components/header.html" %}
+
+    <!-- Start Login -->
+    <div class="login">
+        <div class="container">
+            <div class="title">
+                <div>Login</div>
+                <div>
+                    <p>Welcome Back.</p>
+                </div>
+            </div>
+
+            <div id="login-form">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {{form}}
+                    <div>
+                        {% comment %} <a id='password_reset' href="{% url 'password_reset' %}">Reset Password</a> {% endcomment %}
+                        <a id='password_reset' href="">Reset Password</a>
+                    </div>
+                    <div>
+                        <label>Login * :</label>
+                        <input type="submit" value="Login">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- End Login -->
+
+    {% include "components/footer.html" %}
+
+{% endblock content %}
