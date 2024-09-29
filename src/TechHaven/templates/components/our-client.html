@@ -1,0 +1,89 @@
+{% load static %}
+<div class="reviews">
+    <div class="title">
+        <i class="fa-solid fa-users"></i>
+        <p>Our Client Saying!</p>
+    </div>
+    <i id="arrow" data-arrow_name="left" class="fa-solid fa-arrow-left"></i>
+    <div class="container">
+        {% if reviews %}
+            {% for review in reviews %}        
+                <div class="card">
+                    <div class="description">{{review.content}}</div>
+                    <div class="client">
+                        <div class="col">
+                            <div class="box">
+                                <div class="image"><img src="{{review.reviewer.avatar.url}}" alt=""></div>
+                            </div>
+                            <div class="box">
+                                <div class="name">{{review.reviewer.user.username}}</div>
+                                <div class="stars">
+                                    {% if review.score == 1 %}
+                                        <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    {% elif review.score == 2 %}
+                                        <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                        <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    {% elif review.score == 3 %} 
+                                        <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                        <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                        <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>   
+                                    {% elif review.score == 4 %}
+                                        <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                        <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                        <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                        <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>  
+                                    {% elif review.score == 5 %}
+                                        <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                        <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                        <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                        <i style='color: var(--main-green);' class="fas fa-star"></i> 
+                                        <i style='color: var(--main-green);' class="fas fa-star"></i> 
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <i class="fa fa-quote-right quote"></i>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}      
+        {% else %}
+            <div class="card">
+                <div class="description">{{review.content}}</div>
+                <div class="client">
+                    <div class="col">
+                        <div class="box">
+                            <div class="image"><img src="{% static 'images/avatars/avatar.png' %}" alt=""></div>
+                        </div>
+                        <div class="box">
+                            <div class="name">James</div>
+                            <div class="stars">
+                                    <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                    <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                    <i style='color: var(--main-green);' class="fas fa-star"></i>
+                                    <i style='color: var(--main-green);' class="fas fa-star"></i> 
+                                    <i style='color: var(--main-green);' class="fas fa-star"></i> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <i class="fa fa-quote-right quote"></i>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+    <i id="arrow" data-arrow_name="right" class="fa-solid fa-arrow-right"></i>
+</div>

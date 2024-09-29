@@ -40,11 +40,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'django-countries',
+    # Third packages
+    'django_countries',
+    'django_recaptcha',
+
     'store',
 ]
 
-# AUTH_USER_MODEL = 'core.CustomUser'
+AUTH_USER_MODEL = 'store.CustomUser'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

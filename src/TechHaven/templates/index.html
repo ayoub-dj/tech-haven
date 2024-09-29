@@ -16,28 +16,28 @@
                     <button>See More</button>
                 </div>
             </div>
-            <div class="item" style="background-image: url({% static 'images/iphone.webp' %});">
+            <div class="item" style="background-image: url({% static 'images/landing-images/iphone.webp' %});">
                 <div class="content">
                     <div class="name">New Phones</div>
                     <div class="des">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ab, eum!</div>
                     <button>See More</button>
                 </div>
             </div>
-            <div class="item" style="background-image: url({% static 'images/laptop.webp' %});">
+            <div class="item" style="background-image: url({% static 'images/landing-images/laptop.webp' %});">
                 <div class="content">
                     <div class="name">Amazing Laptop</div>
                     <div class="des">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ab, eum!</div>
                     <button>See More</button>
                 </div>
             </div>
-            <div class="item" style="background-image: url({% static 'images/phone.png' %});">
+            <div class="item" style="background-image: url({% static 'images/landing-images/phone.png' %});">
                 <div class="content">
                     <div class="name">Wonderful Phone</div>
                     <div class="des">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ab, eum!</div>
                     <button>See More</button>
                 </div>
             </div>
-            <div class="item" style="background-image: url({% static 'images/watch.jpg' %});">
+            <div class="item" style="background-image: url({% static 'images/landing-images/watch.jpg' %});">
                 <div class="content">
                     <div class="name">Smart Watch</div>
                     <div class="des">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ab, eum!</div>
@@ -104,9 +104,16 @@
                         </div>
                     {% endfor %}
                 {% else %}
-                <div class="card">
-                    <p>No products to show</p>
-                </div>
+                    <div class="card">
+                        <div class="image">
+                            <img src="{% static 'images/products/product-1.jpg' %}" alt="">
+                        </div>
+                        <div class="product-name"><a href="{% url 'home' %}">Product Name</a></div>
+                        <div class="product-price">$10000</div>
+                        <div class="product-action">
+                            <button data-product='{{product.id}}' data-action="add" class="add-to-cart">Add To Cart</button>
+                        </div>
+                    </div>
                 {% endif %}
 
             </div>

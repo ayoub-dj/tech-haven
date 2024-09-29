@@ -94,7 +94,8 @@
     <!-- Main Javascript -->
     <script src="{% static 'js/main.js' %}"></script>
     <script>
-        let user = "{{request.user}}"
+        {% comment %} let user = "{{request.user}}" {% endcomment %}
+        let user = null
 
         function loadMessages() {
             document.addEventListener('DOMContentLoaded', function() {
