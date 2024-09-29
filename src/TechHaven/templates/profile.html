@@ -1,0 +1,141 @@
+{% extends "base/layout.html" %}
+
+{% block title %}Tech Haven - My Account{% endblock title %}
+
+{% block content %}
+{% load static %}
+
+    {% include "components/header.html" %}
+
+    <!-- Start Profile -->
+    <div class="profile">
+        <div class="container">
+
+            <!-- Start Profile Header -->
+            <div class="profile-header">
+                <div class="title">My Profile</div>
+                <div class="image">
+                    <img src="{{request.user.customer.avatar.url}}" alt="">
+                </div>
+                <div class="greeting-user">
+                    <p>Hi <span>{{request.user.username}},</span></p>
+                    <p>
+                        this is your profile where you can change your details, upload personal documents and check status of pending orders.
+                    </p>
+                </div>
+            </div>
+            <!-- End Profile Header -->
+        
+            <!-- Start Profile Body -->
+            <section id="profile-body">
+                <ul class="profile-body-links">
+                    <li class="mydetails active" data-name="details">My Details</li>
+                    <li class="myorders" data-name="orders">My Orders</li>
+                </ul>
+        
+                <div data-name="details" class="profile-details-content dropdown active">
+                    <h2>My Details</h2>
+
+                    <div id="profile-form">
+                        <form action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            {{profile_form}}
+
+                            <div>
+                                <label for="id_avatar">Avatar:</label>
+                                <input type="file" name="avatar-image" accept="image/*" id="id_avatar">
+                            </div>
+                            
+                            <div id='current-avatar'>
+                                <a target="blank" href="{{request.scheme}}://{{ request.get_host }}{{request.user.customer.avatar.url}}">Current Avatar</a>
+                            </div>
+
+                            <div>
+                                <label>UPDATE PROFILE * :</label>
+                                <input type="submit" value="UPDATE">
+                            </div>
+        
+                        </form>
+                    </div>
+        
+                    <div id="changepassword-form">
+                        <h2>Change Password</h2>
+    
+                        <form action="{% url 'change_password_auth' request.user.id %}" method="post">
+                            {% csrf_token %}
+                            <div>
+                                <label for="id_old_password">Old password: </label>
+                                <input type="password" name="old_password" required="" id="id_old_password">    
+                            </div>
+    
+                            <div>
+                                <label for="id_new_password1">New password: </label>
+                                <input type="password" name="new_password1" required="" id="id_new_password1">
+                            </div>
+    
+                            <div>
+                                <label for="id_new_password2">Retype password: </label>
+                                <input type="password" name="new_password2" required="" id="id_new_password2"> 
+                            </div>
+                
+                            <div>
+                                <label>UPDATE PASSWORD * :</label>
+                                <input type="submit" value="UPDATE">
+                            </div>
+    
+                        </form>
+    
+                    </div>
+                </div>
+        
+                <div data-name="orders" class="profile-orders-content dropdown">
+                    <h2>My Orders</h2>
+        
+                </div>
+        
+            </section>
+            <!-- End Profile Body -->
+
+
+        </div>
+    </div>
+    <!-- End Profile -->
+
+    {% include "components/footer.html" %}
+    <script>
+        const profileBodyLinks = Array.from(document.querySelectorAll('.profile .container #profile-body .profile-body-links li')),
+        profileBodyDropDowns = Array.from(document.querySelectorAll('.profile .container #profile-body .dropdown'));
+
+        const productEntireInfoLinksHandler = (productEntireInfoLinks, productEntireInfoDropDowns) => {
+            productEntireInfoLinks.forEach((productEntireInfoLink) => {
+                productEntireInfoLink.addEventListener("click", (e) => {
+                    let targetElement = e.target;
+                    productEntireInfoLinks.forEach((elem) => {
+                        elem.classList.remove('active');
+                    });
+                    productEntireInfoDropDowns.forEach((dropDown) => {
+                        dropDown.classList.remove('active');
+                        if (dropDown.getAttribute('data-name') == targetElement.getAttribute('data-name')) {
+                            dropDown.classList.add('active')
+                        } else {
+                            dropDown.classList.remove('active')
+                        }
+                    });
+                    targetElement.classList.add('active');
+                });
+            });
+        };
+
+        productEntireInfoLinksHandler(profileBodyLinks, profileBodyDropDowns);
+
+        document.getElementById("username").value = '{{request.user.username}}'
+        document.getElementById("email").value = '{{request.user.email}}'
+
+
+        {% comment %} const avatarDiv = document.getElementById('id_avatar').parentElement; {% endcomment %}
+        
+        {% comment %} avatarDiv.querySelector('a').style.display = 'none' {% endcomment %}
+    </script>
+
+{% endblock content %}

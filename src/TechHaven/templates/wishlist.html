@@ -1,0 +1,46 @@
+{% extends "base/layout.html" %}
+
+{% block title %}TechHaven WhishList{% endblock title %}
+{% block content %}
+{% load static %}
+    {% include "components/header.html" %}
+
+    <!-- Start WishList -->
+    <div class="wishlist">
+        <div class="container">
+            <div class="products-list">
+                {% if wishlist %}
+                    {% for i in wishlist %}
+                        <div class="card">
+                            <div class="image">
+                                <img src="{{i.product.product_main_image.url}}" alt="">
+                            </div>
+                            <div class="product-name">
+                                <a href="{% url 'single_product' i.product.product_slug %}">{{i.product.product_name}}</a>
+                            </div>
+                            <div class="product-price">${{i.product.product_price}}</div>
+                            <div class="product-action">
+                                <button class="add-to-cart">Add To Cart</button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p style='
+                        height: 200px;
+                        font-size: 22px;
+                        font-weight: bold;
+                        color: var(--main-blue);
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    '
+                    >Your WishList is empty </p>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+    <!-- End WishList -->
+
+    {% include "components/footer.html" %}
+{% endblock content %}

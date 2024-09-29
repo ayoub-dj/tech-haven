@@ -1,5 +1,5 @@
 
-from .models import Product, Category
+from .models import *
 from django.utils.text import slugify
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
@@ -13,6 +13,8 @@ User = get_user_model()
 
 
 def header_handler():
+    mobile_phones, mobile_phones_os, mobile_phones_hot_brand, computers, computers_appearance, computers_hot_brand, brands, brands_categories, accessories, accessories_categories, electronics, electronics_categories = None, None, None, None, None, None, None, None, None, None, None, None,
+
     try:
         # Start Mobile Phone Categories
         mobile_phones = Category.objects.get(category_slug="mobile-phones")
@@ -41,8 +43,8 @@ def header_handler():
         electronics_categories = Category.objects.filter(parent=electronics)
         # End Electronics
     except:
-        mobile_phones, mobile_phones_os, mobile_phones_hot_brand, computers, computers_appearance, computers_hot_brand, brands, brands_categories, accessories, accessories_categories, electronics, electronics_categories = None, None, None, None, None, None, None, None, None, None, None, None, 
-
+        pass
+    
     return {
         'mobile_phones': mobile_phones,
         'mobile_phones_os': mobile_phones_os,
@@ -57,6 +59,7 @@ def header_handler():
         'electronics': electronics,
         'electronics_categories': electronics_categories,
     }
+
 
 
 def getCartCookie(request):
@@ -119,3 +122,24 @@ def send_six_digit_number_to_email(request, sixDigit, user_id):
         messages.success(request, f'A verification code has been sent to your email address. ({receiver}) Please check your inbox or spam folder.')
     except Exception as e:
         messages.error(request, f'Oops! It seems there was a problem while trying to send your email ({receiver}). Please try again later or contact support for assistance.')
+
+
+def create_unique_slug(name, target):
+    slug = slugify(name)
+    unique_slug = slug
+
+    if target == 'product':
+        number = 1
+        while Product.objects.filter(product_slug=unique_slug).exists():
+            unique_slug = f"{slug}-{number}"
+            number += 1
+            
+    elif target == 'category':
+        number = 1
+        while Category.objects.filter(category_slug=unique_slug).exists():
+            unique_slug = f"{slug}-{number}"
+            number += 1
+
+            
+    return unique_slug
+

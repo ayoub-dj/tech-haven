@@ -1,0 +1,79 @@
+{% extends "base/layout.html" %}
+
+{% block title %} {{child_category.name}} {% endblock title %}
+{% block content %}
+{% load static %}
+
+    {% include "components/header.html" %}
+
+    <!-- Start Products -->
+    <div class="products">
+        <div class="container">
+            <div class="category-name">{{child_category.name}}</div>
+            <div class="box">
+                <div class="devices-count">
+                    <span>
+                        {% if category_products_count %}
+                            {{category_products_count}}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </span>
+                    <p>devices found</p>
+                </div>
+                <div class="sorts-by-target">
+                    <select name="sort" id="sort">
+                        <option value="name">Sort by name</option>
+                        <option value="priceDesc" selected="selected">Sort by price descending</option>
+                        <option value="priceAsc">Sort by price ascending</option>
+                        <option value="popular">Sort by popularity</option>
+                        <option value="rating">Sort by customer ratings</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="products-list">
+                {% if products %}                
+                    {% for product in products %}               
+                        <div class="card">
+                            <div class="image">
+                                <img src="{{product.product_main_image.url}}" a  l="">
+                            </div>
+                            <div class="product-name">
+                                <a href="{% url 'single_product' product.product_slug %}">{{product.product_name}}</a>
+                            </div>
+                            <div class="product-price">${{product.product_price}}</div>
+                            <div class="product-action">
+                                <button data-product="{{product.id}}" data-action="add" id="add-to-cart">Add To Cart</button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                        <div style='
+                            font-weight: bold;
+                            font-size: 22px;
+                            text-align: center;
+                            color: var(--main-green);
+                            min-height: 150px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            width: 100%;
+                        '>No Products Avalable</div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+    <!-- End Products -->
+
+    {% include "components/footer.html" %}
+
+    <script type="module">
+        const addToCardButton = document.getElementById('add-to-cart');
+        import { cartHandler } from '{% static "js\module.js" %}';
+        
+        addToCardButton.addEventListener("click", (e) => cartHandler(e.target.tagName === 'SPAN' || e.target.tagName === 'I' ? e.target.parentElement : e.target))
+    </script>
+    
+{% endblock content %}

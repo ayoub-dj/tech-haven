@@ -393,7 +393,7 @@ header .container .category .select-category-button  {
     flex-wrap: wrap;
 }
 #computers .computers-links .box:last-child ul .link {
-    width: calc(100% / 3);
+    width: calc(100% / 4);
     margin: 10px 0;
 }
 #computers .computers-links .box:last-child ul .link  a {

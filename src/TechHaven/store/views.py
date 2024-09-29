@@ -13,22 +13,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-from .models import (
-    Customer,
-    Product,
-    Category,
-    Review,
-    PasswordResetCode,
-    WishList,
-    Coupon,
-)
+from .models import *
 from django.http import HttpResponse
-from .utils import (
-    header_handler,
-    generate_secure_six_digit_number,
-    send_six_digit_number_to_email,
-    getCartCookie,
-)
+from .utils import *
 User = get_user_model()
 
 # Start Home View
@@ -62,7 +49,6 @@ def home_view(request):
     products = Product.objects.all()
 
     reviews = [i for i in Review.objects.all() if i.score >= 4.0]
-
 
     context = {
         'products': products,
@@ -340,4 +326,539 @@ def cart_view(request):
 
     return render(request, 'cart.html', context)
 # End Cart View
+
+
+# Start Password Reset
+def password_reset_view(request):
+    if request.method == 'POST':
+        form = CustomPasswordResetForm(request.POST)
+
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            user = get_object_or_404(User, email=email)
+            code = generate_secure_six_digit_number()
+            send_six_digit_number_to_email(request, code, user.id)
+            reset_code = PasswordResetCode.objects.create(user=user, code=code)
+            reset_code.save()
+
+            return redirect('password_reset_verify', pk=user.id)
+
+    else: form = CustomPasswordResetForm()
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'password-reset.html', context)
+# End Password Reset
+
+
+# Start Password Reset Verify
+def password_reset_verify_view(request, pk):
+    user = get_object_or_404(User, id=pk)
+
+    if request.method == 'POST':
+        form = SixDigitForm(request.POST)
+
+        if form.is_valid():
+            six_digit_number = form.cleaned_data.get('six_digit_number')
+            
+            try:
+                right_code = get_object_or_404(PasswordResetCode, user=user, code=six_digit_number)
+                if right_code.is_expired():
+                    messages.error(request, 'Reset code has expired.')
+                    right_code.delete()
+                else:
+                    right_code.delete()
+                    return redirect('password_reset_done', pk=user.id)
+                
+
+            except:
+                messages.info(request, 'The verification code is not correct.')
+
+
+    else: form = SixDigitForm()
+
+    context = {
+        'form': form,
+        'user': user,
+    }
+
+    return render(request, 'password-reset-verify.html', context)
+# End Password Reset Verify
+
+
+# Start Password Reset Done
+def password_reset_done_view(request, pk):
+    user = get_object_or_404(User, id=pk)
+
+    items_count = getCartCookie(request)['items_count']
+
+    try:
+        wishlist = WishList.objects.filter(customer_wishlist=request.user.customer)
+        wishlist_count = wishlist.count()
+    except:
+        wishlist = None
+        wishlist_count = None
+
+    # Start Start Header Handler
+    mobile_phones = header_handler()['mobile_phones']
+    mobile_phones_os = header_handler()['mobile_phones_os']
+    mobile_phones_hot_brand = header_handler()['mobile_phones_hot_brand']
+
+    computers = header_handler()['computers']
+    computers_appearance = header_handler()['computers_appearance']
+    computers_hot_brand = header_handler()['computers_hot_brand']
+
+    brands  = header_handler()['brands']
+    brands_categories = header_handler()['brands_categories']
+
+    accessories = header_handler()['accessories']
+    accessories_categories = header_handler()['accessories_categories']
+
+    electronics = header_handler()['electronics']
+    electronics_categories = header_handler()['electronics_categories']
+    # End Start Header Handler
+
+    if request.method == 'POST':
+        form = CustomPasswordResetFormDone(request.POST)
+
+        if form.is_valid():
+            password = form.cleaned_data.get('password', None)
+            if password is not None:
+                user.set_password(raw_password=password)
+                user.save()
+                messages.success(request, 'Your Password has been changed successfully')
+                user_done = authenticate(request, username=user.email, password=password)
+
+                if user_done is not None:
+                    login(request, user_done)
+                    return redirect('home')
+            
+    else: form = CustomPasswordResetFormDone()
+
+    context = {
+        'form': form,
+
+        'items_count': items_count,
+        'wishlist_count': wishlist_count,
+
+        # Start Header Handler
+        'mobile_phones': mobile_phones,
+        'mobile_phones_os': mobile_phones_os,
+        'mobile_phones_hot_brand': mobile_phones_hot_brand,
+        'computers': computers,
+        'computers_appearance': computers_appearance,
+        'computers_hot_brand': computers_hot_brand,
+        'brands': brands,
+        'brands_categories': brands_categories,
+        'accessories': accessories,
+        'accessories_categories': accessories_categories,
+        'electronics': electronics,
+        'electronics_categories': electronics_categories,
+        # End Header Handler
+    }
+    return render(request, 'password-reset-done.html', context)
+# End Password Reset Done
+
+
+# Start Profile View
+@login_required(login_url='login')
+def profile_view(request, username):
+    items_count = getCartCookie(request)['items_count']
+
+    try:
+        wishlist = WishList.objects.filter(customer_wishlist=request.user.customer)
+        wishlist_count = wishlist.count()
+    except:
+        wishlist = None
+        wishlist_count = None
+
+    # Start Start Header Handler
+    mobile_phones = header_handler()['mobile_phones']
+    mobile_phones_os = header_handler()['mobile_phones_os']
+    mobile_phones_hot_brand = header_handler()['mobile_phones_hot_brand']
+
+    computers = header_handler()['computers']
+    computers_appearance = header_handler()['computers_appearance']
+    computers_hot_brand = header_handler()['computers_hot_brand']
+
+    brands  = header_handler()['brands']
+    brands_categories = header_handler()['brands_categories']
+
+    accessories = header_handler()['accessories']
+    accessories_categories = header_handler()['accessories_categories']
+
+    electronics = header_handler()['electronics']
+    electronics_categories = header_handler()['electronics_categories']
+    # End Start Header Handler
+
+    if request.user.id == User.objects.get(username=username).id:
+        customer = Customer.objects.get(user=User.objects.get(username=username))
+        if request.method == 'POST':
+            profile_form = ProfileFormCustomer(instance=customer, data=request.POST, files=request.FILES, user=request.user)
+
+            if profile_form.is_valid(): 
+                avatar = request.FILES.get('avatar-image')
+                user = User.objects.get(username=username)
+                username_form = profile_form.cleaned_data['username']
+                email_form = profile_form.cleaned_data['email']
+
+                if username_form:
+                    user.username = username_form
+
+                if email_form:
+                    user.email = email_form                
+
+                if avatar is not None:
+                    customer.avatar = avatar
+
+                profile_form.save()
+                user.save()
+
+                messages.success(request, 'Profile Updated successfully')
+
+                return redirect('profile', username=user.username)
+
+            
+        else:
+            profile_form = ProfileFormCustomer(instance=customer, user=request.user)
+
+        context = {
+            'profile_form': profile_form,
+
+            'items_count': items_count,
+
+            'wishlist_count': wishlist_count,
+
+            # Start Header Handler
+            'mobile_phones': mobile_phones,
+            'mobile_phones_os': mobile_phones_os,
+            'mobile_phones_hot_brand': mobile_phones_hot_brand,
+            'computers': computers,
+            'computers_appearance': computers_appearance,
+            'computers_hot_brand': computers_hot_brand,
+            'brands': brands,
+            'brands_categories': brands_categories,
+            'accessories': accessories,
+            'accessories_categories': accessories_categories,
+            'electronics': electronics,
+            'electronics_categories': electronics_categories,
+            # End Header Handler
+
+        }
+
+        return render(request, 'profile.html', context)
+    else:
+        return HttpResponse('Not Allowed')
+# End Profile View
+
+# Start Change Password Auth
+@login_required(login_url='login')
+def change_password_auth_view(request, pk):
+    user = User.objects.get(id=pk)
+    
+    if request.method == 'POST':
+        old_password = request.POST.get('old_password', None)
+        password1 = request.POST.get('new_password1', None)
+        password2 = request.POST.get('new_password2', None)
+        if user.check_password(old_password):
+            if password1 and password2 and password1 == password2:
+                user.set_password(raw_password=password1)
+                user.save()
+                messages.success(request, 'password successfully changed')
+            else:
+                messages.info(request, 'Passwords dont not match')
+        else:
+            messages.info(request, 'Old password does not correct')
+
+    return redirect('profile', username=user.username)
+# End Change Password Auth
+
+
+# Start Single Product
+def single_product_view(request, slug):
+    items_count = getCartCookie(request)['items_count']
+
+    try:
+        wishlist = WishList.objects.filter(customer_wishlist=request.user.customer)
+        wishlist_count = wishlist.count()
+    except:
+        wishlist = None
+        wishlist_count = None
+
+    # Start Start Header Handler
+    mobile_phones = header_handler()['mobile_phones']
+    mobile_phones_os = header_handler()['mobile_phones_os']
+    mobile_phones_hot_brand = header_handler()['mobile_phones_hot_brand']
+
+    computers = header_handler()['computers']
+    computers_appearance = header_handler()['computers_appearance']
+    computers_hot_brand = header_handler()['computers_hot_brand']
+
+    brands  = header_handler()['brands']
+    brands_categories = header_handler()['brands_categories']
+
+    accessories = header_handler()['accessories']
+    accessories_categories = header_handler()['accessories_categories']
+
+    electronics = header_handler()['electronics']
+    electronics_categories = header_handler()['electronics_categories']
+    # End Start Header Handler
+
+    product = get_object_or_404(Product, product_slug=slug)
+    product_colors = product.product_colors.all()
+    product_reviews = product.review_set.all()
+
+    network_features, launch_details, body_details, display_details, platform_details, memory_details = None, None, None, None, None, None
+    sound_features, communication_features, battery_details, main_camera_details, selfie_camera_details = None, None, None, None, None
+
+    if hasattr(product, 'networkfeatures'):
+        network_features = product.networkfeatures
+
+    if hasattr(product, 'launchdetails'):
+        launch_details = product.launchdetails
+
+    if hasattr(product, 'bodydetails'):
+        body_details = product.bodydetails
+
+    if hasattr(product, 'displaydetails'):
+        display_details = product.displaydetails
+
+    if hasattr(product, 'platformdetails'):
+        platform_details = product.platformdetails
+
+    if hasattr(product, 'memorydetails'):
+        memory_details = product.memorydetails
+        
+    if hasattr(product, 'soundfeatures'):
+        sound_features = product.soundfeatures
+
+    if hasattr(product, 'communicationfeatures'):
+        communication_features = product.communicationfeatures
+
+    if hasattr(product, 'batterydetails'):
+        battery_details = product.batterydetails
+
+    if hasattr(product, 'maincameradetails'):
+        main_camera_details = product.maincameradetails
+
+    if hasattr(product, 'selfiecameradetails'):
+        selfie_camera_details = product.selfiecameradetails
+
+    all_related_to_product = any([network_features, launch_details, body_details, display_details, platform_details, memory_details, sound_features, communication_features, battery_details, main_camera_details, selfie_camera_details])
+
+
+    context = {
+        'product': product,
+        'product_colors': product_colors,
+        'product_reviews': product_reviews,
+
+        'items_count': items_count,
+        'wishlist_count': wishlist_count,
+
+        'all_related_to_product': all_related_to_product,
+
+        # Start Header Handler
+        'mobile_phones': mobile_phones,
+        'mobile_phones_os': mobile_phones_os,
+        'mobile_phones_hot_brand': mobile_phones_hot_brand,
+        'computers': computers,
+        'computers_appearance': computers_appearance,
+        'computers_hot_brand': computers_hot_brand,
+        'brands': brands,
+        'brands_categories': brands_categories,
+        'accessories': accessories,
+        'accessories_categories': accessories_categories,
+        'electronics': electronics,
+        'electronics_categories': electronics_categories,
+        # End Header Handler
+
+    }
+
+    return render(request, 'product-view.html', context)
+# End Single Product
+
+
+# Start WishList View
+@login_required(login_url='login')
+def wishlist_view(request):
+    items_count = getCartCookie(request)['items_count']
+
+    # Start Start Header Handler
+    mobile_phones = header_handler()['mobile_phones']
+    mobile_phones_os = header_handler()['mobile_phones_os']
+    mobile_phones_hot_brand = header_handler()['mobile_phones_hot_brand']
+
+    computers = header_handler()['computers']
+    computers_appearance = header_handler()['computers_appearance']
+    computers_hot_brand = header_handler()['computers_hot_brand']
+
+    brands  = header_handler()['brands']
+    brands_categories = header_handler()['brands_categories']
+
+    accessories = header_handler()['accessories']
+    accessories_categories = header_handler()['accessories_categories']
+
+    electronics = header_handler()['electronics']
+    electronics_categories = header_handler()['electronics_categories']
+    # End Start Header Handler
+
+    try:
+        wishlist = WishList.objects.filter(customer_wishlist=request.user.customer)
+        wishlist_count = wishlist.count()
+    except:
+        wishlist = None
+        wishlist_count = None
+
+    context = {
+        'items_count': items_count,
+
+        'wishlist': wishlist,
+        'wishlist_count': wishlist_count,
+
+        # Start Header Handler
+        'mobile_phones': mobile_phones,
+        'mobile_phones_os': mobile_phones_os,
+        'mobile_phones_hot_brand': mobile_phones_hot_brand,
+        'computers': computers,
+        'computers_appearance': computers_appearance,
+        'computers_hot_brand': computers_hot_brand,
+        'brands': brands,
+        'brands_categories': brands_categories,
+        'accessories': accessories,
+        'accessories_categories': accessories_categories,
+        'electronics': electronics,
+        'electronics_categories': electronics_categories,
+        # End Header Handler 
+    }
+
+    return render(request, 'wishlist.html',  context)
+# End WishList View
+
+
+# Start WishList Handler
+@login_required(login_url='login')
+def wishlist_handler(request, pk):
+    if request.method == 'POST':
+        product = get_object_or_404(Product, id=pk)
+        customer = request.user.customer
+
+        if not WishList.objects.filter(product=product, customer_wishlist=customer).exists():
+            WishList.objects.create(product=product, customer_wishlist=customer)
+
+
+        return redirect('single_product', slug=product.product_slug)
+# End WishList Handler
+
+
+# Start Remove Coupon Code
+def remove_coupon_code(request):
+    if request.method == 'POST':
+        if 'code' in request.session:
+            del request.session['code']
+        return redirect('cart')
+# End Remove Coupon Code
+
+
+# Start Product Category
+def product_category_view(request, parent, slug):
+    items_count = getCartCookie(request)['items_count']
+
+    try:
+        wishlist = WishList.objects.filter(customer_wishlist=request.user.customer)
+        wishlist_count = wishlist.count()
+    except:
+        wishlist = None
+        wishlist_count = None
+
+    # Start Start Header Handler
+    mobile_phones = header_handler()['mobile_phones']
+    mobile_phones_os = header_handler()['mobile_phones_os']
+    mobile_phones_hot_brand = header_handler()['mobile_phones_hot_brand']
+
+    computers = header_handler()['computers']
+    computers_appearance = header_handler()['computers_appearance']
+    computers_hot_brand = header_handler()['computers_hot_brand']
+
+    brands  = header_handler()['brands']
+    brands_categories = header_handler()['brands_categories']
+
+    accessories = header_handler()['accessories']
+    accessories_categories = header_handler()['accessories_categories']
+
+    electronics = header_handler()['electronics']
+    electronics_categories = header_handler()['electronics_categories']
+    # End Start Header Handler
+
+
+    child_category = Category.objects.get(category_slug=slug)
+    category_products = child_category.products.all()
+    category_products_count = category_products.count()
+
+
+    context = {
+        'products': category_products,
+        'category_products_count': category_products_count,
+        'child_category': child_category,
+
+        'items_count': items_count,
+
+        'wishlist_count': wishlist_count,
+
+        # Start Header Handler
+        'mobile_phones': mobile_phones,
+        'mobile_phones_os': mobile_phones_os,
+        'mobile_phones_hot_brand': mobile_phones_hot_brand,
+        'computers': computers,
+        'computers_appearance': computers_appearance,
+        'computers_hot_brand': computers_hot_brand,
+        'brands': brands,
+        'brands_categories': brands_categories,
+        'accessories': accessories,
+        'accessories_categories': accessories_categories,
+        'electronics': electronics,
+        'electronics_categories': electronics_categories,
+        # End Header Handler
+
+    }
+
+    return render(request, 'products.html', context)
+# End Product Category
+
+
+# Start Review Handler
+@login_required(login_url='login')
+def review_handler(request, pk):
+    product = get_object_or_404(Product, id=pk)
+    if request.method == 'POST':
+        customer = request.user.customer
+        text = request.POST.get('content', None)
+        rating = request.POST.get('rating', None)
+
+        if Review.objects.filter(product=product, reviewer=customer).exists():
+            messages.info(request, "You can't review product twice")
+            return redirect('single_product', slug=product.product_slug)
+
+        else:
+            review = Review.objects.create(
+                reviewer=customer,
+                content=text,
+                score=rating,
+                product=product,
+            )
+            review.save()
+            return redirect('single_product', slug=product.product_slug)
+# End Review Handler
+
+
+
+
+
+
+
+
+
+
+
 
