@@ -839,12 +839,9 @@ header .container .category .select-category-button  {
 }
 .best-offer .products-list .card {
     text-align: center;
-    height: 600px;
     padding: 30px 0px;
     border-radius: 8px;
-    border: 1px solid var(--main-orange);
-    border-left: none;
-    border-right: none;
+    box-shadow: 0px 0px 5px 1px #ccc;
 }
 .products-list.dragging .card {
     user-select: none;
@@ -870,9 +867,8 @@ header .container .category .select-category-button  {
     color: var(--main-purple);
 }
 .best-offer .products-list .card .product-name a {
-    min-height: 70px;
     display: block;
-    font-size: 14px;
+    font-size: 18px;
     color: var(--main-orange);
 }
 .best-offer .products-list .card .product-price {
