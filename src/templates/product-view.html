@@ -58,15 +58,16 @@
                         <span class="price-number">{{product.product_price}} $</span>
                         <span class="delivery-time">DELIVERY IN 4-6 DAYS</span>
                     </div>
-                    <div class="product-info_general_specifications">
-                        <h3><span>RAM</span> & <span>Storage</span></h3>
-                        <div>
-                            <span>{{product.memorydetails.ram}}</span>
-                            <span>{{product.memorydetails.storage}}</span>
+                    {% if product.memorydetails %}                    
+                        <div class="product-info_general_specifications">
+                            <h3><span>RAM</span> & <span>Storage</span></h3>
+                            <div>
+                                <span>{{product.memorydetails.ram}}</span>
+                                <span>{{product.memorydetails.storage}}</span>
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
                     <div class="product-info_buttons">
-
                         <button data-product="{{product.id}}" data-action="add" id="add-to-cart">
                             <i class="fa-solid fa-cart-shopping"></i>
                             <span>Add To Cart</span>
@@ -304,21 +305,21 @@
                             </div>
                         {% endif %}
 
-                        {% if product.mainCameradetails %}                    
+                        {% if product.maincameradetails %}                    
                             <div class="specifications-content-main-camera">
                                 <div class="specifications-content-main-camera-name">Main Camera:</div>
                                 <ul>
                                     <li>
                                         <span>Features: </span>
-                                        <span>{{product.mainCameradetails.main_camera_features}}</span>
+                                        <span>{{product.maincameradetails.main_camera_features}}</span>
                                     </li>
                                     <li>
                                         <span>Video: </span>
-                                        <span>{{product.mainCameradetails.main_camera_video}}</span>
+                                        <span>{{product.maincameradetails.main_camera_video}}</span>
                                     </li>
                                     <li>
                                         <span>Dual: </span>
-                                        <span>{{product.mainCameradetails.main_camera_dual}}</span>
+                                        <span>{{product.maincameradetails.main_camera_dual}}</span>
                                     </li>
                                 </ul>
                             </div>
