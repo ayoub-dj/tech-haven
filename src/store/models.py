@@ -53,7 +53,7 @@ class NetworkFeatures(models.Model):
     five_g_bands = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
-        return f"Network: {self.technology}, 5G bands: {self.five_g_bands}"
+        return f"Network: {self.product.product_name}, "
 
 
 class LaunchDetails(models.Model):
@@ -197,7 +197,7 @@ class ProductColor(models.Model):
     color_hex = models.CharField(max_length=50)
 
     def __str__(self):
-        return f"{self.color_name}"
+        return f"{self.color_name} : {self.product.product_name}"
 
 
 class ProductImage(models.Model):

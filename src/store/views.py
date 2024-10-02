@@ -856,7 +856,56 @@ def review_handler(request, pk):
 
 
 
+def checkout_view(request):
+    items_count = getCartCookie(request)['items_count']
 
+    try:
+        wishlist = WishList.objects.filter(customer_wishlist=request.user.customer)
+        wishlist_count = wishlist.count()
+    except:
+        wishlist = None
+        wishlist_count = None
+
+    # Start Start Header Handler
+    mobile_phones = header_handler()['mobile_phones']
+    mobile_phones_os = header_handler()['mobile_phones_os']
+    mobile_phones_hot_brand = header_handler()['mobile_phones_hot_brand']
+
+    computers = header_handler()['computers']
+    computers_appearance = header_handler()['computers_appearance']
+    computers_hot_brand = header_handler()['computers_hot_brand']
+
+    brands  = header_handler()['brands']
+    brands_categories = header_handler()['brands_categories']
+
+    accessories = header_handler()['accessories']
+    accessories_categories = header_handler()['accessories_categories']
+
+    electronics = header_handler()['electronics']
+    electronics_categories = header_handler()['electronics_categories']
+    # End Start Header Handler
+
+    context = {
+        'items_count': items_count,
+
+        'wishlist_count': wishlist_count,   
+        # Start Header Handler
+        'mobile_phones': mobile_phones,
+        'mobile_phones_os': mobile_phones_os,
+        'mobile_phones_hot_brand': mobile_phones_hot_brand,
+        'computers': computers,
+        'computers_appearance': computers_appearance,
+        'computers_hot_brand': computers_hot_brand,
+        'brands': brands,
+        'brands_categories': brands_categories,
+        'accessories': accessories,
+        'accessories_categories': accessories_categories,
+        'electronics': electronics,
+        'electronics_categories': electronics_categories,
+        # End Header Handler
+    }
+
+    return render(request, 'checkout.html', context)
 
 
 

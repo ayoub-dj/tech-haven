@@ -33,4 +33,7 @@ urlpatterns = [
     path('add/review/<str:pk>', views.review_handler, name='review_handler'),
 
     path('remove-coupon-code/', views.remove_coupon_code, name='remove_coupon_code'),
+
+    path('checkout/', views.checkout_view, name='checkout'),
+
 ]
