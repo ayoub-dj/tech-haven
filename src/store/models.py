@@ -292,3 +292,14 @@ class Subscription(models.Model):
     subscribed_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self): return 'Subscription'
+
+
+
+class ShippingAddress(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    name = models.CharField(max_length=122)
+    email = models.CharField(max_length=200)
+    created = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self): f"{self.name}"

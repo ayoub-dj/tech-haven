@@ -11,7 +11,54 @@
     {% include "components/header.html" %}
 
     <div class="checkout">
-        <div class="container"></div>
+        <div class="container">
+            <div class="shipping-address">
+                <form action="">
+                    {% csrf_token %}
+                    <div>
+                        <input type="text" placeholder="Name" name="name" id="">
+                    </div>
+                    <div>
+                        <input type="text" placeholder="Email" name="email" id="">
+                    </div>
+                    <h3>Shipping Information:</h3>
+                    <div>
+                        <input class="form-control" type="text" name="address" placeholder="Address..">
+                    </div>
+                    <div>
+                        <input class="form-control" type="text" name="city" placeholder="City..">
+                    </div>
+                    <div>
+                        <input class="form-control" type="text" name="state" placeholder="State..">
+                    </div>
+                    <div>
+                        <input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
+                    </div>
+                    <div>
+                        <input type="submit" value="Continue">
+                    </div>
+                </form>
+            </div>
+            <div class="products-checkout">
+                <a href="{% url 'cart' %}" class="back">Back to cart</a>
+                <div class="title">Order Summary</div>
+                {% for cart_item in cart_items %}
+                    <div class="product">
+                        <div class="product-image">
+                            <img src="{{cart_item.product_image}}" alt="">
+                        </div>
+                        <div class="product-name">{{cart_item.product_name}}</div>
+                        <div class="price">${{cart_item.product_price}}</div>
+                        <div class="quantity">X{{cart_item.product_quantity}}</div>
+                    </div>
+                    {% endfor %}
+                
+                <div class="checkout-info">
+                    <div class="total-price">Total Price: {{total_price}}</div>
+                    <div class="items-count">Items Count: {{items_count}}</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     {% include "components/footer.html" %}

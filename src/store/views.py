@@ -852,12 +852,11 @@ def review_handler(request, pk):
 # End Review Handler
 
 
-
-
-
-
+# Start Checkout
 def checkout_view(request):
     items_count = getCartCookie(request)['items_count']
+    total_price = getCartCookie(request)['total_price']
+    cart_items = getCartCookie(request)['cart_items']
 
     try:
         wishlist = WishList.objects.filter(customer_wishlist=request.user.customer)
@@ -887,6 +886,8 @@ def checkout_view(request):
 
     context = {
         'items_count': items_count,
+        'total_price': total_price,
+        'cart_items': cart_items,
 
         'wishlist_count': wishlist_count,   
         # Start Header Handler
@@ -906,8 +907,5 @@ def checkout_view(request):
     }
 
     return render(request, 'checkout.html', context)
-
-
-
-
+# End Checkout
 
