@@ -12,10 +12,13 @@ from .forms import (
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
 from .models import *
 from django.http import HttpResponse
 from .utils import *
+
+import stripe
 User = get_user_model()
 
 # Start Home View
@@ -884,6 +887,52 @@ def checkout_view(request):
     electronics_categories = header_handler()['electronics_categories']
     # End Start Header Handler
 
+    if request.method == 'POST':
+        country = request.POST.get('country', None)
+        house_number = request.POST.get('house_number', None)
+        address = request.POST.get('address', None)
+        city = request.POST.get('city', None)
+        zipcode = request.POST.get('zipcode', None)
+
+        shipping_address = ShippingAddress.objects.create(
+            country=country,
+            house_number=house_number,
+            address=address,
+            city=city,
+            zipcode=zipcode,
+        )
+
+        if request.user.is_authenticated:
+            customer = request.user.customer
+            name = f"{request.user.customer.first_name} {request.user.customer.last_name}"
+            email = request.user.email
+
+            shipping_address.customer = customer
+            shipping_address.save()
+
+            Order.objects.create(
+                customer=customer,
+                name=name,
+                email=email,
+                shipping_address=shipping_address,
+            )
+
+            return HttpResponse('Authenticated User')
+            
+        else:
+            name = request.POST.get('name', None)
+            email = request.POST.get('email', None)
+
+            Order.objects.create(
+                name=name,
+                email=email,
+                shipping_address=shipping_address,
+            )
+
+            return HttpResponse('Guest User')
+
+
+
     context = {
         'items_count': items_count,
         'total_price': total_price,
@@ -909,3 +958,24 @@ def checkout_view(request):
     return render(request, 'checkout.html', context)
 # End Checkout
 
+
+def process_order(request):
+    checkout_session = stripe.checkout.Session.create(
+        customer_email = '',
+        payment_method_types = ['card'],
+        line_items = [
+            {
+                'price_data': {
+                    'currency': 'USD',
+                    'product_data': {
+                        'name': 'order_name',
+                    },
+                    'unit_amount': 'order * 1000',
+                },
+                'quantity': 1
+            }
+        ],
+        mode = 'payment',
+        success_url = '',
+        cancel_url = ''
+    )

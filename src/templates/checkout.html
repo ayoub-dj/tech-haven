@@ -13,26 +13,31 @@
     <div class="checkout">
         <div class="container">
             <div class="shipping-address">
-                <form action="">
+                <form action="" method='post'>
                     {% csrf_token %}
-                    <div>
-                        <input type="text" placeholder="Name" name="name" id="">
-                    </div>
-                    <div>
-                        <input type="text" placeholder="Email" name="email" id="">
-                    </div>
+                    {% if not request.user.is_authenticated %}
+                        <div>
+                            <input type="text" placeholder="Name" name="name" id="">
+                        </div>
+                        <div>
+                            <input type="text" placeholder="Email" name="email" id="">
+                        </div>
+                    {% endif %}
                     <h3>Shipping Information:</h3>
                     <div>
-                        <input class="form-control" type="text" name="address" placeholder="Address..">
+                        <input class="form-control" value='{{request.user.customer.country}}' type="text" name="country" placeholder="Country..">
                     </div>
                     <div>
-                        <input class="form-control" type="text" name="city" placeholder="City..">
+                        <input class="form-control" value='{{request.user.customer.house_number}}' type="text" name="house_number" placeholder="House number..">
                     </div>
                     <div>
-                        <input class="form-control" type="text" name="state" placeholder="State..">
+                        <input class="form-control" value='{{request.user.customer.address}}' type="text" name="address" placeholder="Address..">
                     </div>
                     <div>
-                        <input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
+                        <input class="form-control" value='{{request.user.customer.city}}' type="text" name="city" placeholder="City..">
+                    </div>
+                    <div>
+                        <input class="form-control" value='{{request.user.customer.postcode}}' type="text" name="zipcode" placeholder="Zip code..">
                     </div>
                     <div>
                         <input type="submit" value="Continue">
@@ -54,7 +59,7 @@
                     {% endfor %}
                 
                 <div class="checkout-info">
-                    <div class="total-price">Total Price: {{total_price}}</div>
+                    <div class="total-price">Total Price: {{total_price}}$</div>
                     <div class="items-count">Items Count: {{items_count}}</div>
                 </div>
             </div>

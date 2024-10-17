@@ -294,12 +294,24 @@ class Subscription(models.Model):
     def __str__(self): return 'Subscription'
 
 
+class Order(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    email = models.CharField(max_length=200, null=True)
+    name = models.CharField(max_length=100, null=True)
+    completed = models.BooleanField(default=False, null=True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    shipping_address = models.ForeignKey('ShippingAddress', on_delete=models.SET_NULL, null=True)
+
+
 
 class ShippingAddress(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    name = models.CharField(max_length=122)
-    email = models.CharField(max_length=200)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    country = models.CharField(max_length=122)
+    house_number = models.CharField(max_length=122)
+    address = models.CharField(max_length=122)
+    city = models.CharField(max_length=200)
+    zipcode = models.CharField(max_length=200)
     created = models.DateTimeField(auto_now_add=True)
 
 
-    def __str__(self): f"{self.name}"
+

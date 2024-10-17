@@ -52,3 +52,8 @@ admin.site.register(LaunchDetails)
 
 
 admin.site.register(NetworkFeatures)
+
+
+
+admin.site.register(Order)
+admin.site.register(ShippingAddress)
