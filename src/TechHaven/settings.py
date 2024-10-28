@@ -141,7 +141,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST', cast=str)
+EMAIL_HOST = config('EMAIL_HOST', cast=str, default='smtp.gmail.com')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_FROM = config('DEFAULT_FROM_EMAIL', cast=str)
@@ -155,3 +155,6 @@ PASSWORD_RESET_TIMEOUT = 14400
 RECAPTCHA_PUBLIC_KEY = '6LcInu0pAAAAAGQT7SEUAvDBO-7Y2SReWgczJBF0'
 RECAPTCHA_PRIVATE_KEY = config('RECAPTCHA_PRIVATE_KEY', cast=str)
 SILENCED_SYSTEM_CHECKS = ['django_recaptcha.recaptcha_test_key_error']
+
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', cast=str)
+STRIPE_PUBLIC_KEY = config('STRIPE_PUBLIC_KEY', cast=str)

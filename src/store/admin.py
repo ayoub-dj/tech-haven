@@ -57,3 +57,4 @@ admin.site.register(NetworkFeatures)
 
 admin.site.register(Order)
 admin.site.register(ShippingAddress)
+admin.site.register(OrderItems)

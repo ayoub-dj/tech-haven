@@ -18,18 +18,18 @@ class CustomUser(AbstractUser):
 class Customer(models.Model):
     GENDER_CHOICES = [('M', 'male'), ('F', 'female')]
 
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.SET_NULL, null=True)
 
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=100, null=True, blank=True)
+    last_name = models.CharField(max_length=100, null=True, blank=True)
     address = models.CharField(max_length=300)
     phone_number = models.CharField(max_length=200, null=True, blank=True)
     postcode = models.CharField(max_length=20)
     house_number = models.IntegerField()
     city = models.CharField(max_length=100)
-    country = CountryField(blank_label='Select country', default='US')
+    country = models.CharField(max_length=200)
     avatar = models.ImageField(upload_to='avatars/', default='avatars/default_avatar.png', null=True, blank=True)
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='M')
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
     joined = models.DateTimeField(auto_now_add=True)
 
     @property
@@ -293,6 +293,7 @@ class Subscription(models.Model):
 
     def __str__(self): return 'Subscription'
 
+    
 
 class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
@@ -300,11 +301,25 @@ class Order(models.Model):
     name = models.CharField(max_length=100, null=True)
     completed = models.BooleanField(default=False, null=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
-    shipping_address = models.ForeignKey('ShippingAddress', on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return f'{self.name} Order'
+    
+    def total_price(self):
+        return sum(item.product.product_price * item.quantity for item in self.order_items.all())
 
 
+class OrderItems(models.Model):
+    order = models.ForeignKey('Order',  related_name='order_items', on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.quantity} OrderItem'
 
 class ShippingAddress(models.Model):
+    order = models.ForeignKey('Order', on_delete=models.SET_NULL, null=True)
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     country = models.CharField(max_length=122)
     house_number = models.CharField(max_length=122)
@@ -312,6 +327,10 @@ class ShippingAddress(models.Model):
     city = models.CharField(max_length=200)
     zipcode = models.CharField(max_length=200)
     created = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self):
+        return f'{self.country} ShippingAddress'
 
 
 

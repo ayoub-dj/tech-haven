@@ -19,6 +19,9 @@ from django.http import HttpResponse
 from .utils import *
 
 import stripe
+from django.conf import settings
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
 User = get_user_model()
 
 # Start Home View
@@ -887,49 +890,50 @@ def checkout_view(request):
     electronics_categories = header_handler()['electronics_categories']
     # End Start Header Handler
 
-    if request.method == 'POST':
-        country = request.POST.get('country', None)
-        house_number = request.POST.get('house_number', None)
-        address = request.POST.get('address', None)
-        city = request.POST.get('city', None)
-        zipcode = request.POST.get('zipcode', None)
+                
+    # if request.method == 'POST':
+    #     country = request.POST.get('country', None)
+    #     house_number = request.POST.get('house_number', None)
+    #     address = request.POST.get('address', None)
+    #     city = request.POST.get('city', None)
+    #     zipcode = request.POST.get('zipcode', None)
 
-        shipping_address = ShippingAddress.objects.create(
-            country=country,
-            house_number=house_number,
-            address=address,
-            city=city,
-            zipcode=zipcode,
-        )
+    #     shipping_address = ShippingAddress.objects.create(
+    #         country=country,
+    #         house_number=house_number,
+    #         address=address,
+    #         city=city,
+    #         zipcode=zipcode,
+    #     )
 
-        if request.user.is_authenticated:
-            customer = request.user.customer
-            name = f"{request.user.customer.first_name} {request.user.customer.last_name}"
-            email = request.user.email
+    #     if request.user.is_authenticated:
+    #         customer = request.user.customer
+    #         name = f"{request.user.customer.first_name} {request.user.customer.last_name}"
+    #         email = request.user.email
 
-            shipping_address.customer = customer
-            shipping_address.save()
+    #         shipping_address.customer = customer
+    #         shipping_address.save()
 
-            Order.objects.create(
-                customer=customer,
-                name=name,
-                email=email,
-                shipping_address=shipping_address,
-            )
+    #         Order.objects.create(
+    #             customer=customer,
+    #             name=name,
+    #             email=email,
+    #             shipping_address=shipping_address,
+    #         )
 
-            return HttpResponse('Authenticated User')
+    #         return HttpResponse('Authenticated User')
             
-        else:
-            name = request.POST.get('name', None)
-            email = request.POST.get('email', None)
+    #     else:
+    #         name = request.POST.get('name', None)
+    #         email = request.POST.get('email', None)
 
-            Order.objects.create(
-                name=name,
-                email=email,
-                shipping_address=shipping_address,
-            )
+    #         Order.objects.create(
+    #             name=name,
+    #             email=email,
+    #             customer=customer,
+    #         )
 
-            return HttpResponse('Guest User')
+    #         return HttpResponse('Guest User')
 
 
 
@@ -958,24 +962,87 @@ def checkout_view(request):
     return render(request, 'checkout.html', context)
 # End Checkout
 
+from django.http import JsonResponse
 
 def process_order(request):
-    checkout_session = stripe.checkout.Session.create(
-        customer_email = '',
-        payment_method_types = ['card'],
-        line_items = [
-            {
-                'price_data': {
-                    'currency': 'USD',
-                    'product_data': {
-                        'name': 'order_name',
+    if request.method == 'POST':
+        country = request.POST.get('country')
+        house_number = request.POST.get('house_number')
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        zipcode = request.POST.get('zipcode')
+
+        if not request.user.is_authenticated:
+            name = request.POST.get('name')
+            email = request.POST.get('email')
+            order = Order.objects.create(
+                email=email,
+                name=name,
+            )
+            shipping_address = ShippingAddress.objects.create(
+                order=order,
+                country=country,
+                house_number=house_number,
+                address=address,
+                city=city,
+                zipcode=zipcode
+            )
+            cookie = getCartCookie(request)['cart_items']
+            for i in cookie:
+                product_id = int(i['product_id'])
+                product_quantity = int(i['product_quantity'])
+
+                product = get_object_or_404(Product, pk=product_id)
+                OrderItems.objects.create(
+                    order=order,
+                    product=product,
+                    quantity=product_quantity,
+                )
+        else:
+            customer = request.user.customer
+            name = request.user.username
+            email = request.user.email
+            order = Order.objects.create(
+                customer=customer,
+                email=email,
+                name=name,
+            )
+            shipping_address = ShippingAddress.objects.create(
+                customer=customer,
+                order=order,
+                country=country,
+                house_number=house_number,
+                address=address,
+                city=city,
+                zipcode=zipcode
+            )
+            cookie = getCartCookie(request)['cart_items']
+            for i in cookie:
+                product_id = int(i['product_id'])
+                product_quantity = int(i['product_quantity'])
+                product = get_object_or_404(Product, pk=product_id)
+                OrderItems.objects.create(
+                    order=order,
+                    product=product,
+                    quantity=product_quantity,
+                )
+        checkout_session = stripe.checkout.Session.create(
+            customer_email = email,
+            payment_method_types = ['card'],
+            line_items = [
+                {
+                    'price_data': {
+                        'currency': 'USD',
+                        'product_data': {
+                            'name': 'simple',
+                        },
+                        'unit_amount': int(order.total_price()) * 100,
                     },
-                    'unit_amount': 'order * 1000',
-                },
-                'quantity': 1
-            }
-        ],
-        mode = 'payment',
-        success_url = '',
-        cancel_url = ''
-    )
+                    'quantity': 1
+                }
+            ],
+            mode = 'payment',
+            success_url='https://google.com',
+            cancel_url='https://facebook.com'
+        )
+        return redirect(checkout_session.url)
