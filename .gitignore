@@ -120,6 +120,8 @@ __pypackages__/
 celerybeat-schedule
 celerybeat.pid
 
+db.sqlite3
+
 # SageMath parsed files
 *.sage.py
 
